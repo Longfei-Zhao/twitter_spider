@@ -4,14 +4,15 @@ import csv
 import datetime
 import GetOldTweets3 as got
 import os, sys, re, getopt
-part = 2
+
 
 
 BEFORE_TIME_DELTA = datetime.timedelta(days=-60)
 AFTER_TIME_DELTA = datetime.timedelta(days=5)
 
-
-input_file = 'input_part' + str(part) + '.csv'
+# part = 1
+# input_file = 'input_part' + str(part) + '.csv'
+input_file = 'input.csv'
 count_file = 'count_tweets.csv'
 
 def main():
@@ -27,7 +28,8 @@ def main():
             day, month, year = map(int, date.split('/'))
             year += 2000
             event_date = datetime.date(year, month, day)
-            result_file_name = 'res_part{}/{}_{}.csv'.format(str(part), account_name, event_date.strftime('%Y%m%d'))
+            # result_file_name = 'res_part{}/{}_{}.csv'.format(str(part), account_name, event_date.strftime('%Y%m%d'))
+            result_file_name = 'res/{}_{}.csv'.format(account_name, event_date.strftime('%Y%m%d'))
             start_date = event_date + BEFORE_TIME_DELTA
             end_date = event_date + AFTER_TIME_DELTA
             print('Company name: {}, company account: {}, event date: {}'.format(name, account_name, event_date.strftime("%Y-%m-%d")))
@@ -37,6 +39,13 @@ def main():
             tweet_criteria.since = start_date.strftime("%Y-%m-%d")
             tweet_criteria.until = end_date.strftime("%Y-%m-%d")
             print('Starting scrape tweets...')
+            if os.path.isfile(result_file_name):
+                with open(result_file_name) as result_file:
+                    len_lines = sum(1 for line in result_file)
+                    if len_lines == 1 or len_lines % 100 != 1:
+                    # if sum(1 for line in result_file) != 1:
+                        print('result already exists...')
+                        continue
             with open(result_file_name, "w+", encoding='utf-8') as result_file:
                 result_file.write('date,username,to,retweets,favorites,text,geo,mentions,hashtags,id,permalink\n')
                 cnt = 0
